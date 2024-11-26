@@ -1,29 +1,23 @@
 # Base image
 FROM ubuntu:20.04
 
-# Set the maintainer
+# Set maintainer
 LABEL maintainer="your-email@example.com"
 
-# Disable interactive prompts during package installation
+# Set non-interactive mode for apt
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Update and install required tools
+# Update and install Apache
 RUN apt-get update && \
-    apt-get install -y curl gnupg2 apt-transport-https && \
+    apt-get install -y apache2 && \
     apt-get clean
 
-# Import Elasticsearch GPG key and add Elastic repository
-RUN curl -fsSL https://artifacts.elastic.co/GPG-KEY-elasticsearch | apt-key add - && \
-    echo "deb https://artifacts.elastic.co/packages/8.x/apt stable main" > /etc/apt/sources.list.d/elastic-8.x.list
+# Enable Apache service and set up default document root
+RUN echo "Hello, Apache is running inside a Docker container!" > /var/www/html/index.html
 
-# Update and install Kibana
-RUN apt-get update && \
-    apt-get install -y kibana && \
-    apt-get clean
+# Expose the default HTTP port
+EXPOSE 80
 
-# Expose Kibana's default port
-EXPOSE 5601
-
-# Start Kibana
-CMD ["/usr/share/kibana/bin/kibana"]
+# Start Apache in the foreground
+CMD ["apachectl", "-D", "FOREGROUND"]
 
